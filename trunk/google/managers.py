@@ -5,12 +5,13 @@ import datetime
 
 class CalendarManager(Manager):
 	def get_or_create(self, account, data):
-		id = data.id.text
+		uri = data.id.text
 		try:
-			result = self.get(id = id)
+			result = self.get(uri = uri)
 		except self.model.DoesNotExist:
 			result = self.model(account = account)
-		for prop in ['color', 'id', 'summary', 'timezone', 'title', 'where']:
+		result.uri = uri
+		for prop in ['color', 'summary', 'timezone', 'title', 'where']:
 			attr = getattr(data, prop)
 			if hasattr(attr, 'text'):
 				setattr(result, prop, attr.text or '')
@@ -113,9 +114,9 @@ def parse_date_w3dtf(dateString):
 
 class EventManager(Manager):
 	def get_or_create(self, calendar, data):
-		id = data.id.text
+		uri = data.id.text
 		try:
-			result = self.get(id = id)
+			result = self.get(uri = uri)
 		except self.model.DoesNotExist:
 			result = self.model(calendar = calendar)
 		result.title = data.title.text

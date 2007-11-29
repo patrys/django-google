@@ -40,7 +40,7 @@ class Calendar(models.Model):
 		pass
 	objects = CalendarManager()
 	account = models.ForeignKey(Account)
-	id = models.CharField(maxlength = 255, primary_key = True)
+	uri = models.CharField(maxlength = 255, unique = True)
 	title = models.CharField(maxlength = 100)
 	where = models.CharField(maxlength = 100, blank = True)
 	color = models.CharField(maxlength = 10, blank = True)
@@ -61,18 +61,17 @@ class Event(models.Model):
 		pass
 	objects = EventManager()
 	calendar = models.ForeignKey(Calendar)
-	id = models.CharField(maxlength = 255, primary_key = True)
+	uri = models.CharField(maxlength = 255, unique = True)
 	title = models.CharField(maxlength  =255)
 	edit_uri = models.CharField(maxlength = 255)
 	view_uri = models.CharField(maxlength = 255)
 	content = models.TextField(blank = True)
 	start_time = models.DateTimeField()
 	end_time = models.DateTimeField()
-	saved = models.BooleanField(default = False)
 	def __unicode__(self):
 		return u'%s (%s - %s)' % (self.title, self.start_time, self.end_time)
 	def save(self):
-		if self.saved: # existing event, update
+		if self.uri: # existing event, update
 			entry = self.calendar.account.service.GetCalendarEventEntry(uri = self.edit_uri)
 			entry.title.text = self.title
 			entry.content.text = self.content
@@ -90,13 +89,12 @@ class Event(models.Model):
 			end_time = self.end_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
 			entry.when.append(gdata.calendar.When(start_time = start_time, end_time = end_time))
 			new_entry = self.calendar.account.service.InsertEvent(entry, self.calendar.feed_uri)
-			self.id = new_entry.id.text
+			self.uri = new_entry.id.text
 			self.edit_uri = new_entry.GetEditLink().href
 			self.view_uri = new_entry.GetHtmlLink().href
-			self.saved = True
 		super(Event, self).save()
 	def delete(self):
-		if self.id: # existing event, delete
+		if self.uri: # existing event, delete
 			self.calendar.account.service.DeleteEvent(self.edit_uri)
 		super(Event, self).delete()
 
