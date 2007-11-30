@@ -1,30 +1,35 @@
 from django.db import models
-import atom
-import gdata.calendar
 import gdata.calendar.service
 import gdata.service
 import datetime
 from managers import CalendarManager, EventManager
 
-VERSION = '0.1'
+VERSION = '0.2'
 
 _services = {}
 
 class Account(models.Model):
 	class Admin:
 		pass
-	email = models.CharField(maxlength = 100)
-	password = models.CharField(maxlength = 100)
+	email = models.CharField(maxlength = 100, blank = True)
+	password = models.CharField(maxlength = 100, blank = True)
+	token = models.CharField(maxlength = 100, blank = True)
 	def __unicode__(self):
-		return u'Account for %s' % self.email
+		if self.email:
+			return u'Account for %s' % self.email
+		else:
+			return u'Account with token'
 	def _get_service(self):
 		if not _services.has_key(self.email):
 			print 'Logging in...'
 			_service = gdata.calendar.service.CalendarService()
-			_service.email = self.email
-			_service.password = self.password
 			_service.source = 'ITSLtd-Django_Google-%s' % VERSION
-			_service.ProgrammaticLogin()
+			if self.token:
+				_service.auth_token = self.token
+			else:
+				_service.email = self.email
+				_service.password = self.password
+				_service.ProgrammaticLogin()
 			_services[self.email] = _service
 		return _services[self.email]
 	service = property(_get_service, None)
@@ -100,12 +105,4 @@ class Event(models.Model):
 		if self.uri: # existing event, delete
 			self.calendar.account.service.DeleteEvent(self.edit_uri)
 		super(Event, self).delete()
-
-def listCals(account):
-	cals = account.get_own_calendars()
-	for c in cals:
-		print c
-		print '--- EVENTS:'
-		for e in c.get_events():
-			print e
 
