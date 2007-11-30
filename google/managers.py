@@ -119,8 +119,8 @@ class EventManager(Manager):
 			result = self.get(uri = uri)
 		except self.model.DoesNotExist:
 			result = self.model(calendar = calendar)
-		result.title = data.title.text
-		result.content = data.content.text
+		result.title = data.title.text or ''
+		result.content = data.content.text or ''
 		result.start_time = parse_date_w3dtf(data.when[0].start_time)
 		result.end_time = parse_date_w3dtf(data.when[0].end_time)
 		result.edit_uri = data.GetEditLink().href
