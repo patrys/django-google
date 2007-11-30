@@ -75,7 +75,10 @@ class Event(models.Model):
 			entry = self.calendar.account.service.GetCalendarEventEntry(uri = self.edit_uri)
 			entry.title.text = self.title
 			entry.content.text = self.content
-			#TODO: support editing dates
+			start_time = self.start_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+			end_time = self.end_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+			entry.when = []
+			entry.when.append(gdata.calendar.When(start_time = start_time, end_time = end_time))
 			self.calendar.account.service.UpdateEvent(entry.GetEditLink().href, entry)
 		else:
 			entry = gdata.calendar.CalendarEventEntry()
@@ -105,5 +108,4 @@ def listCals(account):
 		print '--- EVENTS:'
 		for e in c.get_events():
 			print e
-			print e.edit_uri
 
