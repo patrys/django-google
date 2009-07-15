@@ -11,9 +11,9 @@ _services = {}
 class Account(models.Model):
 	class Admin:
 		pass
-	email = models.CharField(maxlength = 100, blank = True)
-	password = models.CharField(maxlength = 100, blank = True)
-	token = models.CharField(maxlength = 100, blank = True)
+	email = models.CharField(max_length = 100, blank = True)
+	password = models.CharField(max_length = 100, blank = True)
+	token = models.CharField(max_length = 100, blank = True)
 	def __unicode__(self):
 		if self.email:
 			return u'Account for %s' % self.email
@@ -45,13 +45,13 @@ class Calendar(models.Model):
 		pass
 	objects = CalendarManager()
 	account = models.ForeignKey(Account)
-	uri = models.CharField(maxlength = 255, unique = True)
-	title = models.CharField(maxlength = 100)
-	where = models.CharField(maxlength = 100, blank = True)
-	color = models.CharField(maxlength = 10, blank = True)
-	timezone = models.CharField(maxlength = 100, blank = True)
+	uri = models.CharField(max_length = 255, unique = True)
+	title = models.CharField(max_length = 100)
+	where = models.CharField(max_length = 100, blank = True)
+	color = models.CharField(max_length = 10, blank = True)
+	timezone = models.CharField(max_length = 100, blank = True)
 	summary = models.TextField()
-	feed_uri = models.CharField(maxlength = 255, blank = True)
+	feed_uri = models.CharField(max_length = 255, blank = True)
 	def __unicode__(self):
 		return self.title
 	def get_events(self):
@@ -66,10 +66,10 @@ class Event(models.Model):
 		pass
 	objects = EventManager()
 	calendar = models.ForeignKey(Calendar)
-	uri = models.CharField(maxlength = 255, unique = True)
-	title = models.CharField(maxlength  =255)
-	edit_uri = models.CharField(maxlength = 255)
-	view_uri = models.CharField(maxlength = 255)
+	uri = models.CharField(max_length = 255, unique = True)
+	title = models.CharField(max_length = 255)
+	edit_uri = models.CharField(max_length = 255)
+	view_uri = models.CharField(max_length = 255)
 	content = models.TextField(blank = True)
 	start_time = models.DateTimeField()
 	end_time = models.DateTimeField()
